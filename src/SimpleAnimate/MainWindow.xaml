@@ -1,0 +1,41 @@
+﻿<Window x:Class="SimpleAnimate.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:SimpleAnimate.Views"
+        xmlns:vm="clr-namespace:SimpleAnimate.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:MainViewModel}"
+        Title="{Binding Title}"
+        Icon="/Assets/icon.png"
+        Height="700" Width="1000"
+        MinHeight="500" MinWidth="700"
+        WindowState="Maximized"
+        Background="{StaticResource AppBackgroundBrush}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Left: Toolbar -->
+        <views:ToolbarView Grid.Column="0" Grid.Row="0"
+                           DataContext="{Binding Toolbar}"
+                           Margin="8"/>
+
+        <!-- Center: Canvas -->
+        <views:CanvasView Grid.Column="1" Grid.Row="0"
+                          DataContext="{Binding Canvas}"
+                          Margin="8"/>
+
+        <!-- Bottom: Timeline -->
+        <views:TimelineView Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
+                            DataContext="{Binding Timeline}"
+                            Margin="8"/>
+    </Grid>
+</Window>

@@ -1,0 +1,113 @@
+﻿<UserControl x:Class="SimpleAnimate.Views.TimelineView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:SimpleAnimate.ViewModels"
+             xmlns:converters="clr-namespace:SimpleAnimate.Converters"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:TimelineViewModel}">
+    <UserControl.Resources>
+        <converters:FrameSelectedBrushConverter x:Key="FrameSelectedBrush"/>
+    </UserControl.Resources>
+
+    <Border Background="#C8E6C9" CornerRadius="16" Padding="8">
+        <DockPanel>
+            <!-- Playback and frame controls -->
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                <!-- Play / Pause toggle -->
+                <Button Style="{StaticResource BigToolButton}" Background="{StaticResource PinkBrush}"
+                        ToolTip="Play / Pause"
+                        Command="{Binding TogglePlaybackCommand}">
+                    <TextBlock FontSize="20">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="&#x25B6;&#xFE0F;"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                        <Setter Property="Text" Value="&#x23F8;&#xFE0F;"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Button>
+
+                <Button Style="{StaticResource BigToolButton}" Background="{StaticResource GreenBrush}"
+                        Content="&#x2795;" ToolTip="Add Frame"
+                        Command="{Binding AddFrameCommand}"/>
+
+                <Button Style="{StaticResource BigToolButton}" Background="{StaticResource OrangeBrush}"
+                        Content="&#x1F4CB;" ToolTip="Duplicate Frame"
+                        Command="{Binding DuplicateFrameCommand}"/>
+
+                <Button Style="{StaticResource BigToolButton}" Background="{StaticResource RedBrush}"
+                        Content="&#x1F5D1;&#xFE0F;" ToolTip="Delete Frame"
+                        Command="{Binding DeleteFrameCommand}"/>
+            </StackPanel>
+
+            <!-- FPS adjuster docked right -->
+            <Border DockPanel.Dock="Right" Background="#A5D6A7" CornerRadius="12" Padding="6,4" Margin="12,0,0,0"
+                    VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <Button Width="32" Height="32" FontSize="18" FontWeight="Bold"
+                            Content="&#x2796;" ToolTip="Decrease FPS" Cursor="Hand"
+                            Command="{Binding DecreaseFpsCommand}">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="#81C784" CornerRadius="8" BorderThickness="1" BorderBrush="#66000000">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <TextBlock VerticalAlignment="Center" Margin="8,0"
+                               FontSize="14" FontWeight="Bold" Foreground="#333">
+                        <Run Text="{Binding FramesPerSecond, Mode=OneWay}"/>
+                        <Run Text="fps"/>
+                    </TextBlock>
+                    <Button Width="32" Height="32" FontSize="18" FontWeight="Bold"
+                            Content="&#x2795;" ToolTip="Increase FPS" Cursor="Hand"
+                            Command="{Binding IncreaseFpsCommand}">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="#81C784" CornerRadius="8" BorderThickness="1" BorderBrush="#66000000">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- Frame strip -->
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding Frames}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource FrameThumbButton}"
+                                    Command="{Binding DataContext.SelectFrameCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding}">
+                                <!-- Highlight background when this is the selected frame -->
+                                <Button.Background>
+                                    <MultiBinding Converter="{StaticResource FrameSelectedBrush}">
+                                        <Binding/>
+                                        <Binding RelativeSource="{RelativeSource AncestorType=UserControl}" Path="DataContext.SelectedFrame"/>
+                                    </MultiBinding>
+                                </Button.Background>
+                                <TextBlock Text="{Binding Index, StringFormat='#{0}'}"
+                                           FontSize="16" FontWeight="Bold"
+                                           Foreground="#555"/>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
+</UserControl>

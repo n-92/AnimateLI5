@@ -1,0 +1,174 @@
+﻿<UserControl x:Class="SimpleAnimate.Views.ToolbarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:SimpleAnimate.ViewModels"
+             xmlns:models="clr-namespace:SimpleAnimate.Core.Models;assembly=SimpleAnimate.Core"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:ToolbarViewModel}">
+
+    <Border Background="#DCEDC8" CornerRadius="16" Padding="8">
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Orientation="Vertical">
+
+                <!-- === Tools === -->
+                <TextBlock Text="&#x1F6E0;&#xFE0F;" FontSize="24" HorizontalAlignment="Center" Margin="0,4"/>
+
+                <UniformGrid Columns="2" HorizontalAlignment="Center" Margin="0,4">
+                    <Button Style="{StaticResource BigToolButton}" Background="{StaticResource OrangeBrush}"
+                            Content="&#x1F446;" ToolTip="Move / Select"
+                            Command="{Binding SelectMoveToolCommand}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="#A5D6A7"
+                            Content="&#x1F58C;&#xFE0F;" ToolTip="Brush / Draw"
+                            Command="{Binding SelectToolCommand}" CommandParameter="{x:Static models:ElementKind.Drawing}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="#FFCDD2"
+                            ToolTip="Eraser"
+                            Command="{Binding SelectEraserToolCommand}">
+                        <Grid>
+                            <Rectangle Width="28" Height="16" RadiusX="3" RadiusY="3"
+                                       Fill="#E0E0E0" Stroke="#888888" StrokeThickness="1.5"
+                                       RenderTransformOrigin="0.5,0.5">
+                                <Rectangle.RenderTransform>
+                                    <RotateTransform Angle="-30"/>
+                                </Rectangle.RenderTransform>
+                            </Rectangle>
+                            <Rectangle Width="12" Height="16" RadiusX="2" RadiusY="2"
+                                       Fill="#F48FB1" Stroke="#888888" StrokeThickness="1.5"
+                                       HorizontalAlignment="Left" Margin="2,0,0,0"
+                                       RenderTransformOrigin="0.5,0.5">
+                                <Rectangle.RenderTransform>
+                                    <RotateTransform Angle="-30"/>
+                                </Rectangle.RenderTransform>
+                            </Rectangle>
+                        </Grid>
+                    </Button>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="{StaticResource PinkBrush}"
+                            Content="&#x1F5BC;&#xFE0F;" ToolTip="Open Asset Library"
+                            Command="{Binding OpenAssetLibraryCommand}"/>
+                </UniformGrid>
+
+                <!-- Brush size buttons -->
+                <UniformGrid Columns="3" HorizontalAlignment="Center" Margin="0,2,0,4">
+                    <Button Width="40" Height="40" Margin="2" ToolTip="Thin brush"
+                            Command="{Binding SelectBrushSizeCommand}">
+                        <Button.CommandParameter>
+                            <sys:Double>2</sys:Double>
+                        </Button.CommandParameter>
+                        <Ellipse Width="6" Height="6" Fill="#333333"/>
+                    </Button>
+                    <Button Width="40" Height="40" Margin="2" ToolTip="Medium brush"
+                            Command="{Binding SelectBrushSizeCommand}">
+                        <Button.CommandParameter>
+                            <sys:Double>5</sys:Double>
+                        </Button.CommandParameter>
+                        <Ellipse Width="14" Height="14" Fill="#333333"/>
+                    </Button>
+                    <Button Width="40" Height="40" Margin="2" ToolTip="Thick brush"
+                            Command="{Binding SelectBrushSizeCommand}">
+                        <Button.CommandParameter>
+                            <sys:Double>10</sys:Double>
+                        </Button.CommandParameter>
+                        <Ellipse Width="24" Height="24" Fill="#333333"/>
+                    </Button>
+                </UniformGrid>
+
+                <Separator Margin="4,8"/>
+
+                <!-- === Shapes === -->
+                <TextBlock Text="&#x1F532;" FontSize="24" HorizontalAlignment="Center" Margin="0,4"/>
+
+                <UniformGrid Columns="2" HorizontalAlignment="Center" Margin="0,4">
+                    <Button Style="{StaticResource BigToolButton}" Background="{StaticResource BlueBrush}"
+                            Content="&#x2B1C;" ToolTip="Rectangle"
+                            Command="{Binding SelectToolCommand}" CommandParameter="{x:Static models:ElementKind.Rectangle}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="{StaticResource GreenBrush}"
+                            Content="&#x26AA;" ToolTip="Circle"
+                            Command="{Binding SelectToolCommand}" CommandParameter="{x:Static models:ElementKind.Ellipse}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="{StaticResource YellowBrush}"
+                            Content="&#x2B50;" ToolTip="Star"
+                            Command="{Binding SelectToolCommand}" CommandParameter="{x:Static models:ElementKind.Star}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="#B2EBF2"
+                            Content="&#x25B3;" ToolTip="Triangle"
+                            Command="{Binding SelectToolCommand}" CommandParameter="{x:Static models:ElementKind.Triangle}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="#F0F4C3"
+                            Content="&#x2B1F;" ToolTip="Pentagon"
+                            Command="{Binding SelectToolCommand}" CommandParameter="{x:Static models:ElementKind.Pentagon}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="#E1BEE7"
+                            Content="&#x2B22;" ToolTip="Hexagon"
+                            Command="{Binding SelectToolCommand}" CommandParameter="{x:Static models:ElementKind.Hexagon}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="#FFCCBC"
+                            Content="&#x2B22;" ToolTip="Heptagon"
+                            Command="{Binding SelectToolCommand}" CommandParameter="{x:Static models:ElementKind.Heptagon}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="#B3E5FC"
+                            Content="&#x25C7;" ToolTip="Rhombus"
+                            Command="{Binding SelectToolCommand}" CommandParameter="{x:Static models:ElementKind.Rhombus}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="#C8E6C9"
+                            Content="&#x23E2;" ToolTip="Trapezium"
+                            Command="{Binding SelectToolCommand}" CommandParameter="{x:Static models:ElementKind.Trapezium}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="#FFE0B2"
+                            Content="&#x25B1;" ToolTip="Parallelogram"
+                            Command="{Binding SelectToolCommand}" CommandParameter="{x:Static models:ElementKind.Parallelogram}"/>
+                </UniformGrid>
+
+                <Separator Margin="4,8"/>
+
+                <!-- === Colors === -->
+                <TextBlock Text="&#x1F3A8;" FontSize="24" HorizontalAlignment="Center" Margin="0,4"/>
+
+                <ItemsControl ItemsSource="{Binding ColorPalette}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel MaxWidth="120"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource ColorSwatchButton}"
+                                    Command="{Binding DataContext.SelectColorCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding}">
+                                <Button.Background>
+                                    <SolidColorBrush Color="{Binding}"/>
+                                </Button.Background>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Separator Margin="4,8"/>
+
+                <!-- === Actions === -->
+                <UniformGrid Columns="2" HorizontalAlignment="Center">
+                    <Button Style="{StaticResource BigToolButton}" Background="#CE93D8"
+                            Content="&#x21A9;&#xFE0F;" ToolTip="Undo"
+                            Command="{Binding UndoCommand}"/>
+
+                    <Button Style="{StaticResource BigToolButton}" Background="#90CAF9"
+                            Content="&#x21AA;&#xFE0F;" ToolTip="Redo"
+                            Command="{Binding RedoCommand}"/>
+                </UniformGrid>
+
+                <!-- Export video -->
+                <Button Style="{StaticResource BigToolButton}" Background="#FFD54F"
+                        Width="Auto" HorizontalAlignment="Stretch" Margin="4,8,4,4"
+                        Content="&#x1F3AC;" ToolTip="Export as MP4 Video"
+                        Command="{Binding ExportVideoCommand}"/>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</UserControl>

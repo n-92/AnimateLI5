@@ -1,0 +1,193 @@
+﻿<UserControl x:Class="SimpleAnimate.Views.CanvasView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:SimpleAnimate.Converters"
+             xmlns:models="clr-namespace:SimpleAnimate.Core.Models;assembly=SimpleAnimate.Core"
+             Focusable="True"
+             KeyDown="Canvas_KeyDown"
+             AllowDrop="True"
+             DragOver="Canvas_DragOver"
+             Drop="Canvas_Drop">
+    <UserControl.Resources>
+        <converters:ElementKindToGeometryConverter x:Key="KindToGeo"/>
+        <converters:NullToVisibilityConverter x:Key="NullToCollapsed"
+            NullValue="Collapsed" NonNullValue="Visible"/>
+        <converters:NullToVisibilityConverter x:Key="NullToVisible"
+            NullValue="Visible" NonNullValue="Collapsed"/>
+        <converters:IsSelectedConverter x:Key="IsSelectedMulti"/>
+        <converters:IsSelectedAndSelectModeConverter x:Key="IsSelectedAndSelectMode"/>
+        <converters:StrokePointsToPointsConverter x:Key="StrokeToPoints"/>
+    </UserControl.Resources>
+
+    <Border Background="{StaticResource CanvasBackgroundBrush}"
+            BorderBrush="#CCCCCC" BorderThickness="2" CornerRadius="12" ClipToBounds="True">
+        <Grid>
+            <ItemsControl ItemsSource="{Binding Elements}"
+                          MouseLeftButtonDown="Canvas_MouseLeftButtonDown"
+                          Background="Transparent">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                        <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Width="{Binding Width}" Height="{Binding Height}"
+                              RenderTransformOrigin="0.5,0.5">
+                            <Grid.RenderTransform>
+                                <RotateTransform Angle="{Binding Rotation}"/>
+                            </Grid.RenderTransform>
+
+                            <!-- Shape rendering (when no AssetPath and not Drawing) -->
+                            <Path Data="{Binding Kind, Converter={StaticResource KindToGeo}}"
+                                  Fill="{Binding FillColor}"
+                                  Stretch="Fill"
+                                  MouseLeftButtonDown="Element_MouseLeftButtonDown">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Setter Property="Visibility" Value="{Binding AssetPath, Converter={StaticResource NullToVisible}}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:ElementKind.Drawing}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
+
+                            <!-- Image rendering (when AssetPath is set) -->
+                            <Image Visibility="{Binding AssetPath, Converter={StaticResource NullToCollapsed}}"
+                                   Source="{Binding AssetPath}"
+                                   Stretch="Fill"
+                                   MouseLeftButtonDown="Element_MouseLeftButtonDown"/>
+
+                            <!-- Drawing rendering (completed freehand strokes) -->
+                            <Polyline Stroke="{Binding FillColor}"
+                                      StrokeThickness="{Binding StrokeWidth}"
+                                      StrokeLineJoin="Round"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      MouseLeftButtonDown="Element_MouseLeftButtonDown">
+                                <Polyline.Points>
+                                    <MultiBinding Converter="{StaticResource StrokeToPoints}">
+                                        <Binding/>
+                                        <Binding Path="StrokeVersion"/>
+                                    </MultiBinding>
+                                </Polyline.Points>
+                                <Polyline.Style>
+                                    <Style TargetType="Polyline">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Kind}" Value="{x:Static models:ElementKind.Drawing}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Polyline.Style>
+                            </Polyline>
+
+                            <!-- Selection border -->
+                            <Border BorderBrush="#40C4FF" BorderThickness="2" CornerRadius="2"
+                                    IsHitTestVisible="False">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Value="True">
+                                                <DataTrigger.Binding>
+                                                    <MultiBinding Converter="{StaticResource IsSelectedMulti}">
+                                                        <Binding/>
+                                                        <Binding RelativeSource="{RelativeSource AncestorType=UserControl}" Path="DataContext.SelectedElement"/>
+                                                    </MultiBinding>
+                                                </DataTrigger.Binding>
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+
+                            <!-- Resize handle -->
+                            <Thumb Width="16" Height="16"
+                                   HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                   Cursor="SizeNWSE"
+                                   DragStarted="ResizeHandle_DragStarted"
+                                   DragDelta="ResizeHandle_DragDelta"
+                                   DragCompleted="ResizeHandle_DragCompleted">
+                                <Thumb.Style>
+                                    <Style TargetType="Thumb">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Thumb">
+                                                    <Border Background="#40C4FF" CornerRadius="2"
+                                                            BorderBrush="White" BorderThickness="1"/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Value="True">
+                                                <DataTrigger.Binding>
+                                                    <MultiBinding Converter="{StaticResource IsSelectedAndSelectMode}">
+                                                        <Binding/>
+                                                        <Binding RelativeSource="{RelativeSource AncestorType=UserControl}" Path="DataContext.SelectedElement"/>
+                                                        <Binding RelativeSource="{RelativeSource AncestorType=UserControl}" Path="DataContext.IsSelectMode"/>
+                                                    </MultiBinding>
+                                                </DataTrigger.Binding>
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Thumb.Style>
+                            </Thumb>
+
+                            <!-- Rotate handle -->
+                            <Thumb Width="16" Height="16"
+                                   HorizontalAlignment="Center" VerticalAlignment="Top"
+                                   Margin="0,-20,0,0"
+                                   Cursor="Hand"
+                                   DragStarted="RotateHandle_DragStarted"
+                                   DragDelta="RotateHandle_DragDelta"
+                                   DragCompleted="RotateHandle_DragCompleted">
+                                <Thumb.Style>
+                                    <Style TargetType="Thumb">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Thumb">
+                                                    <Border Background="#66BB6A" CornerRadius="8"
+                                                            BorderBrush="White" BorderThickness="1"/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Value="True">
+                                                <DataTrigger.Binding>
+                                                    <MultiBinding Converter="{StaticResource IsSelectedAndSelectMode}">
+                                                        <Binding/>
+                                                        <Binding RelativeSource="{RelativeSource AncestorType=UserControl}" Path="DataContext.SelectedElement"/>
+                                                        <Binding RelativeSource="{RelativeSource AncestorType=UserControl}" Path="DataContext.IsSelectMode"/>
+                                                    </MultiBinding>
+                                                </DataTrigger.Binding>
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Thumb.Style>
+                            </Thumb>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Overlay for in-progress drawing (no binding, direct manipulation for performance) -->
+            <Canvas x:Name="DrawingOverlay" IsHitTestVisible="False"/>
+        </Grid>
+    </Border>
+</UserControl>
